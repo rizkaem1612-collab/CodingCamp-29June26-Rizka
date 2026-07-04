@@ -1,0 +1,864 @@
+/* =====================================================
+   LIFE DASHBOARD — desain.css
+   Font   : Arial, Helvetica, system-ui, sans-serif
+   Radius : 8px  (soft rounded corners)
+   Layout : wrapper → header card + 2-col content grid
+   COLOURS: untouched — only layout / type / border
+   ===================================================== */
+
+/* ══════════════════════════════════════════
+   THEME COLOUR TOKENS  ← DO NOT TOUCH
+══════════════════════════════════════════ */
+
+/* ── DARK : Night at the Sea ── */
+[data-theme="dark"] {
+  --bg-main:         #0b1120;
+  --bg-header:       linear-gradient(135deg, #0d1528 0%, #0b1828 60%, #081020 100%);
+  --bg-card:         #111c30;
+  --bg-card-hover:   #152038;
+  --accent:          #3d9be9;
+  --accent-light:    #72bef5;
+  --accent-dim:      rgba(61,155,233,0.14);
+  --success:         #4ade80;
+  --danger:          #f87171;
+  --warning:         #fbbf24;
+  --text-primary:    #dce8f5;
+  --text-secondary:  #7a91ad;
+  --text-muted:      #3d5068;
+  --border:          rgba(61,155,233,0.10);
+  --border-hover:    rgba(61,155,233,0.30);
+  --shadow:          0 4px 28px rgba(0,0,0,0.55);
+  --toggle-bg-off:   #1e3050;
+  --toggle-bg-on:    #3d9be9;
+  --modal-overlay:   rgba(5,12,28,0.75);
+  --badge-easy:      #166534;
+  --badge-easy-txt:  #4ade80;
+  --badge-normal:    #1e3a8a;
+  --badge-normal-txt:#93c5fd;
+  --badge-hard:      #7f1d1d;
+  --badge-hard-txt:  #fca5a5;
+  --scrollbar:       #1e3050;
+  --input-bg:        rgba(255,255,255,0.03);
+  --input-focus-bg:  rgba(61,155,233,0.06);
+  --settings-bg:     rgba(11,17,32,0.90);
+  /* ── Filter bar (dark: sea blue tones) ── */
+  --filter-bar-bg:      rgba(61,155,233,0.06);
+  --filter-bar-border:  rgba(61,155,233,0.22);
+  --filter-input-bg:    rgba(255,255,255,0.05);
+  --filter-input-border:rgba(61,155,233,0.28);
+  --filter-label-color: #7a91ad;
+  --filter-accent:      #3d9be9;
+  --filter-accent-dim:  rgba(61,155,233,0.14);
+  --filter-accent-ring: rgba(61,155,233,0.25);
+}
+
+/* ── LIGHT : Summer Warm ── */
+[data-theme="light"] {
+  --bg-main:         #fff8f0;
+  --bg-header:       linear-gradient(135deg, #ffe5c8 0%, #ffd4a8 50%, #ffc890 100%);
+  --bg-card:         #ffffff;
+  --bg-card-hover:   #fffaf5;
+  --accent:          #e07b39;
+  --accent-light:    #c05e1e;
+  --accent-dim:      rgba(224,123,57,0.12);
+  --success:         #16a34a;
+  --danger:          #dc2626;
+  --warning:         #d97706;
+  --text-primary:    #3b2010;
+  --text-secondary:  #7c5a3a;
+  --text-muted:      #b89070;
+  --border:          rgba(180,110,60,0.15);
+  --border-hover:    rgba(224,123,57,0.40);
+  --shadow:          0 4px 20px rgba(180,100,40,0.12);
+  --toggle-bg-off:   #f0d0b0;
+  --toggle-bg-on:    #e07b39;
+  --modal-overlay:   rgba(80,40,10,0.45);
+  --badge-easy:      #dcfce7;
+  --badge-easy-txt:  #15803d;
+  --badge-normal:    #dbeafe;
+  --badge-normal-txt:#1d4ed8;
+  --badge-hard:      #fee2e2;
+  --badge-hard-txt:  #b91c1c;
+  --scrollbar:       #f0d0b0;
+  --input-bg:        rgba(180,100,40,0.04);
+  --input-focus-bg:  rgba(224,123,57,0.07);
+  --settings-bg:     rgba(255,248,240,0.93);
+  /* ── Filter bar (light: warm summer orange) ── */
+  --filter-bar-bg:      #fff6e5;
+  --filter-bar-border:  #FF8C42;
+  --filter-input-bg:    #fff8f0;
+  --filter-input-border:#FF8C42;
+  --filter-label-color: #7c5a3a;
+  --filter-accent:      #FF8C42;
+  --filter-accent-dim:  rgba(255,140,66,0.12);
+  --filter-accent-ring: rgba(255,140,66,0.28);
+}
+
+/* ══════════════════════════════════════════
+   SHARED TOKENS — layout / type only
+══════════════════════════════════════════ */
+:root {
+  --font:       Arial, Helvetica, system-ui, sans-serif;
+  --transition: 0.2s ease;
+  --radius-sm:  8px;
+  --radius-md:  10px;
+  --radius-lg:  12px;
+}
+
+/* ══════════════════════════════════════════
+   RESET
+══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 24px 24px 56px;
+  transition: background var(--transition), color var(--transition);
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════ */
+.hidden { display: none !important; }
+
+/* ══════════════════════════════════════════
+   SETTINGS PANEL — fixed top-right
+══════════════════════════════════════════ */
+.settings-panel {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--settings-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.setting-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  min-width: 52px;
+  font-family: var(--font);
+}
+
+/* Toggle — pill-shaped track, circular thumb */
+.toggle-switch { display: inline-flex; align-items: center; cursor: pointer; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+.toggle-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 100px;       /* pill */
+  background: var(--toggle-bg-off);
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--toggle-bg-on); }
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-radius: 50%;          /* circle */
+  transition: transform var(--transition);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle-switch input:checked + .toggle-track .toggle-thumb { transform: translateX(18px); }
+
+/* ══════════════════════════════════════════
+   DASHBOARD WRAPPER — main centred container
+══════════════════════════════════════════ */
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ══════════════════════════════════════════
+   CARD — base style
+   border-radius: 8px  |  padding: 24px  |  border: 1px solid
+══════════════════════════════════════════ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  transition: border-color var(--transition), background var(--transition);
+}
+.card:hover { border-color: var(--border-hover); }
+
+/* ══════════════════════════════════════════
+   HEADER CARD  (row 1 — full width)
+   Order: clock → date → greeting
+══════════════════════════════════════════ */
+.header-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: px;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.current-time {
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  line-height: 1;
+  font-family: var(--font);
+}
+
+.current-date {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.greeting-msg {
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ══════════════════════════════════════════
+   CONTENT GRID  (row 2 — 2 columns)
+══════════════════════════════════════════ */
+.content-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr; 
+  gap: 24px; 
+  align-items: start;
+}
+
+/* ── Left column: stacks timer above links ── */
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Right column: todo card stretches full height ── */
+.todo-card {
+  align-self: stretch;
+}
+
+/* ══════════════════════════════════════════
+   CARD TITLES
+══════════════════════════════════════════ */
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-bottom: 16px;
+  text-align: center;   /* timer title centred by default */
+  font-family: var(--font);
+}
+
+/* Left-aligned titles (links, todo) */
+.card-title--left {
+  text-align: left;
+}
+
+/* ══════════════════════════════════════════
+   FOCUS TIMER CARD
+══════════════════════════════════════════ */
+.timer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-right: auto;
+}
+
+.timer-duration-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.dur-label {
+  font-size: 0.82rem;
+  font-weight: 100;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.dur-select {
+  width: 90px;
+  flex: 0 0 auto;
+}
+
+.timer-display {
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin-bottom: 5px;
+  font-family: var(--font);
+  transition: color var(--transition);
+}
+
+.timer-display.running  { color: var(--success); }
+.timer-display.finished { color: var(--warning); }
+
+.timer-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 7px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.timer-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+  min-height: 1.3em;
+}
+
+/* ══════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity var(--transition), transform var(--transition);
+}
+.btn:hover  { opacity: 0.82; transform: translateY(-1px); }
+.btn:active { opacity: 1;    transform: translateY(0); }
+
+.btn-primary   { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-secondary { background: rgba(248,113,113,0.13); color: var(--danger); border-color: rgba(248,113,113,0.35); }
+.btn-ghost     { background: var(--input-bg); color: var(--text-secondary); border-color: var(--border); }
+.btn-icon      { padding: 6px 9px; font-size: 0.82rem; }
+
+/* ══════════════════════════════════════════
+   INPUTS & SELECTS
+══════════════════════════════════════════ */
+.input-field,
+.select-field {
+  flex: 1;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color var(--transition), background var(--transition);
+  min-width: 0;
+}
+.input-field::placeholder { color: var(--text-muted); }
+.input-field:focus,
+.select-field:focus {
+  border-color: var(--accent);
+  background: var(--input-focus-bg);
+}
+
+.select-field {
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a91ad'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  padding-right: 26px;
+}
+
+.select-sm { flex: 0 0 auto; width: 110px; }
+.select-xs { flex: 0 0 auto; width: 120px; font-size: 0.8rem; }
+.input-sm  { flex: 1; font-size: 0.82rem; min-width: 0; }
+
+/* ══════════════════════════════════════════
+   INPUT ROWS
+══════════════════════════════════════════ */
+.input-row {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.meta-row     { flex-wrap: wrap; }
+.link-input-row { flex-wrap: nowrap; }
+
+/* ══════════════════════════════════════════
+   FILTER BAR  (Kategori + Sort + Deadline + Dir)
+   Single row, fully themed to match light/dark
+══════════════════════════════════════════ */
+.filter-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  background: var(--filter-bar-bg);
+  border: 1px solid var(--filter-bar-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+/* Each labelled chip (label + select/input pair) */
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.filter-chip__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--filter-label-color);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+/* ── Themed select inside filter bar ── */
+.filter-select {
+  background: var(--filter-input-bg);
+  border: 1px solid var(--filter-input-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  padding: 5px 26px 5px 9px;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23FF8C42'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  min-width: 80px;
+  accent-color: var(--filter-accent);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.filter-select:focus {
+  border-color: var(--filter-accent);
+  box-shadow: 0 0 0 2px var(--filter-accent-ring);
+  outline: none;
+}
+
+/* ── Themed datetime input inside filter bar ── */
+.filter-date {
+  background: var(--filter-input-bg);
+  border: 1px solid var(--filter-input-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-family: var(--font);
+  cursor: pointer;
+  padding: 5px 9px;
+  min-width: 0;
+  max-width: 190px;
+  accent-color: var(--filter-accent);
+  color-scheme: dark;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+[data-theme="light"] .filter-date { color-scheme: light; }
+.filter-date:focus {
+  border-color: var(--filter-accent);
+  box-shadow: 0 0 0 2px var(--filter-accent-ring);
+  outline: none;
+}
+
+/* Thin vertical divider between chips */
+.filter-divider {
+  display: block;
+  width: 1px;
+  height: 20px;
+  background: var(--filter-bar-border);
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* ASC/DESC direction button */
+.filter-dir-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 14px;
+  border: 1px solid var(--filter-accent);
+  border-radius: 100px;
+  background: var(--filter-accent-dim);
+  color: var(--filter-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+}
+.filter-dir-btn:hover {
+  background: var(--filter-accent);
+  color: #fff;
+  box-shadow: 0 2px 8px var(--filter-accent-ring);
+}
+
+/* ══════════════════════════════════════════
+   TODO LIST
+══════════════════════════════════════════ */
+.todo-card {
+  min-height: 300px; 
+  width: 100%;
+  flex: 1;
+  max-width: 750px; 
+  margin-left: auto;
+}
+.todo-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* let it grow — no fixed max-height so it fills the card */
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.todo-list::-webkit-scrollbar       { width: 4px; }
+.todo-list::-webkit-scrollbar-track { background: transparent; }
+.todo-list::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
+
+/* Each task row: [checkbox] [body flex-1] [actions] */
+.todo-item {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px 17px;
+  transition: background var(--transition), border-color var(--transition);
+  animation: slideIn 0.18s ease;
+}
+.todo-item:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+.todo-item.done  { opacity: 0.5; }
+.todo-item.done .todo-text { text-decoration: line-through; color: var(--text-muted); }
+
+/* Checkbox — far left */
+.todo-check {
+  width: 17px;
+  height: 17px;
+  min-width: 17px;
+  margin-top: 2px;
+  border-radius: 4px;
+  border: 2px solid var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: background var(--transition), border-color var(--transition);
+  position: relative;
+  flex-shrink: 0;
+}
+.todo-check:checked { background: var(--success); border-color: var(--success); }
+.todo-check:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* Text body — flex-1 */
+.todo-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.todo-text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  word-break: break-word;
+  line-height: 1.35;
+}
+.todo-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* Difficulty badges */
+.badge-diff {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 1px 2px;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+.badge-easy   { background: var(--badge-easy);   color: var(--text-secondary); }
+.badge-normal { background: var(--badge-normal);  color: var(--text-secondary); }
+.badge-hard   { background: var(--badge-hard);    color: var(--text-secondary); }
+
+.todo-deadline { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; }
+.todo-deadline.overdue { color: var(--danger); font-weight: 700; }
+
+/* Actions — far right (delete + edit) */
+.todo-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+
+.btn-edit {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: var(--border-hover);
+}
+.btn-delete {
+  background: rgba(248,113,113,0.12);
+  color: var(--danger);
+  border-color: rgba(248,113,113,0.28);
+}
+
+/* ══════════════════════════════════════════
+   QUICK LINKS
+══════════════════════════════════════════ */
+.links-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-right: auto;
+}
+.links-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.links-container::-webkit-scrollbar       { width: 4px; }
+.links-container::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
+
+/* Link pill — displayed as a button-style tag */
+.link-wrapper { display: inline-flex; align-items: center; gap: 2px; }
+
+.link-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+  transition: opacity var(--transition);
+}
+.link-item:hover { opacity: 0.82; }
+
+.link-favicon { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+.btn-remove-link {
+  background: var(--danger);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 6px 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition);
+}
+.btn-remove-link:hover { opacity: 0.75; }
+.todo-controls-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* Mencegah elemen keluar batas jika layar dikecilkan */
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #FF8C42; /* Warna garis tepi luar senada dengan tema */
+  border-radius: 8px;
+  margin-top: 16px;
+  background-color: #FFF6E5; /* Warna latar hangat opsional, bisa dihapus jika mau putih */
+}
+
+.control-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #a0522d; /* Warna cokelat/oranye gelap agar terbaca jelas */
+  text-transform: lowercase;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: #FF8C42; /* Membuat garis vertikal pembatas antar menu */
+}
+/* ══════════════════════════════════════════
+   EMPTY HINT
+══════════════════════════════════════════ */
+.empty-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 16px 0 2px;
+}
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-overlay);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  width: min(460px, 92vw);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.45);
+  animation: slideUp 0.18s ease;
+}
+.modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--text-secondary);
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 100px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  z-index: 2000;
+  white-space: nowrap;
+  font-family: var(--font);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 860px) {
+  .content-grid { grid-template-columns: 1fr; }
+  .todo-card    { align-self: auto; }
+}
+
+@media (max-width: 540px) {
+  body { padding: 10px 10px 48px; }
+  .settings-panel { top: 10px; right: 10px; padding: 10px 12px; }
+  .current-time   { font-size: 2.4rem; }
+  .link-input-row { flex-wrap: wrap; }
+  .input-row      { flex-wrap: wrap; }
+}
