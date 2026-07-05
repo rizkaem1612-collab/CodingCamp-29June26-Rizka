@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" data-theme="dark" data-lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -8,154 +8,269 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════
-       SETTINGS PANEL — fixed top-right
-  ════════════════════════════════════════ -->
-  <div class="settings-panel">
-    <div class="setting-row">
-      <span class="setting-label" data-i18n="theme_label">🌙 Dark</span>
-      <label class="toggle-switch" aria-label="Toggle theme">
-        <input type="checkbox" id="theme-toggle" />
-        <span class="toggle-track"><span class="toggle-thumb"></span></span>
-      </label>
-    </div>
-    <div class="setting-row">
-      <span class="setting-label" data-i18n="lang_label">🇮🇩 ID</span>
-      <label class="toggle-switch" aria-label="Toggle language">
-        <input type="checkbox" id="lang-toggle" />
-        <span class="toggle-track"><span class="toggle-thumb"></span></span>
-      </label>
+  <!-- ═══ SETTINGS GEAR ═══ -->
+  <div class="settings-wrapper" id="settings-wrapper">
+    <button class="settings-gear-btn" id="settings-gear-btn" aria-label="Settings" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06
+          a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09
+          A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83
+          l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+          A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83
+          l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09
+          a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83
+          l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+          a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+    <div class="settings-panel hidden" id="settings-panel">
+      <p class="settings-panel__title">Settings</p>
+      <div class="setting-row">
+        <span class="setting-label" data-i18n="theme_label">🌙 Dark</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="theme-toggle" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label" data-i18n="lang_label">🇮🇩 ID</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="lang-toggle" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════
-       MAIN WRAPPER — centres everything
-  ════════════════════════════════════════ -->
+  <!-- ═══ MAIN WRAPPER ═══ -->
   <div class="dashboard-wrapper">
 
-    <!-- ── ROW 1: HEADER CARD (full width) ── -->
+    <!-- Header card -->
     <div class="card header-card">
-      <h1 id="current-time"  class="current-time">00:00:00</h1>
-      <p  id="current-date"  class="current-date">Senin, 1 Januari 2025</p>
-      <p  id="greeting-msg"  class="greeting-msg">Selamat Pagi! 👋</p>
+      <h1 id="current-time" class="current-time">00:00:00</h1>
+      <p  id="current-date" class="current-date">Senin, 1 Januari 2025</p>
+      <p  id="greeting-msg" class="greeting-msg">Selamat Pagi! 👋</p>
     </div>
 
-    <!-- ── ROW 2: CONTENT GRID ── -->
+    <!-- Content grid -->
     <div class="content-grid">
 
-      <!-- ┌─ KOLOM KIRI ─────────────────┐ -->
+      <!-- Left column -->
       <div class="left-col">
 
-        <!-- A) Focus Timer -->
+        <!-- Focus Timer -->
         <div class="card timer-card">
           <h2 class="card-title" data-i18n="timer_title">⏱ Focus Timer</h2>
 
+          <!-- Duration popup trigger row -->
           <div class="timer-duration-row">
-            <label class="dur-label" data-i18n="timer_duration">Durasi:</label>
-            <select id="timer-select" class="select-field dur-select">
-              <option value="10">10 min</option>
-              <option value="15">15 min</option>
-              <option value="20">20 min</option>
-              <option value="25" selected>25 min</option>
-              <option value="30">30 min</option>
-              <option value="35">35 min</option>
-              <option value="40">40 min</option>
-              <option value="45">45 min</option>
-              <option value="50">50 min</option>
-              <option value="55">55 min</option>
-              <option value="60">60 min</option>
-            </select>
+            <span class="dur-label" data-i18n="timer_duration">Durasi:</span>
+
+            <!-- Duration popup wrapper (same pattern as sort popup) -->
+            <div class="dur-popup-wrapper" id="dur-popup-wrapper">
+              <button class="dur-popup-btn" id="dur-popup-btn"
+                      aria-label="Set duration" aria-expanded="false">
+                <span id="dur-display-label">25 min</span>
+                <!-- Clock icon -->
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </button>
+
+              <!-- Duration popup -->
+              <div class="dur-popup hidden" id="dur-popup">
+                <p class="sort-popup__section" data-i18n="timer_duration">Durasi:</p>
+                <div class="sort-popup__options">
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="10" />
+                    <span>10 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="15" />
+                    <span>15 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="20" />
+                    <span>20 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="25" checked />
+                    <span>25 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="30" />
+                    <span>30 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="35" />
+                    <span>35 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="40" />
+                    <span>40 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="45" />
+                    <span>45 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="50" />
+                    <span>50 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="55" />
+                    <span>55 min</span>
+                  </label>
+                  <label class="sort-popup__item">
+                    <input type="radio" name="timer-dur" value="60" />
+                    <span>60 min</span>
+                  </label>
+                </div>
+              </div><!-- /dur-popup -->
+            </div><!-- /dur-popup-wrapper -->
           </div>
 
           <div class="timer-display" id="timer-display">25:00</div>
-
           <div class="timer-controls">
             <button class="btn btn-primary"   id="btn-start" data-i18n="timer_start">▶ Start</button>
             <button class="btn btn-secondary" id="btn-stop"  data-i18n="timer_stop">⏸ Stop</button>
             <button class="btn btn-ghost"     id="btn-reset" data-i18n="timer_reset">↺ Reset</button>
           </div>
-
           <p class="timer-label" id="timer-label" data-i18n="timer_ready">Siap untuk fokus?</p>
         </div>
 
-        <!-- B) Quick Links -->
+        <!-- Quick Links -->
         <div class="card links-card">
           <h2 class="card-title card-title--left" data-i18n="links_title">🔗 Quick Links</h2>
-
           <div class="input-row link-input-row">
             <input type="text" id="link-name-input" class="input-field"
-              placeholder="Nama link" maxlength="30"
-              data-i18n-placeholder="link_name_ph" />
+              placeholder="Nama link" maxlength="30" data-i18n-placeholder="link_name_ph" />
             <input type="url" id="link-url-input" class="input-field"
-              placeholder="URL"
-              data-i18n-placeholder="link_url_ph" />
+              placeholder="URL" data-i18n-placeholder="link_url_ph" />
             <button class="btn btn-primary" id="btn-add-link" data-i18n="links_add">Add Link</button>
           </div>
-
           <div id="links-container" class="links-container"></div>
-          <p class="empty-hint hidden" id="links-empty" data-i18n="links_empty">Belum ada link. Tambahkan favoritmu! 🌐</p>
+          <p class="empty-hint hidden" id="links-empty" data-i18n="links_empty">
+            Belum ada link. Tambahkan favoritmu! 🌐
+          </p>
         </div>
 
       </div><!-- /left-col -->
 
-      <!-- ┌─ KOLOM KANAN ────────────────┐ -->
+      <!-- Right column — Todo card -->
       <div class="card todo-card">
-        <h2 class="card-title card-title--left" data-i18n="todo_title">✅ Tasks</h2>
 
-        <!-- Add task row -->
-        <div class="input-row">
-          <input type="text" id="todo-input" class="input-field"
-            placeholder="Tambah tugas baru..." maxlength="120"
-            data-i18n-placeholder="todo_placeholder" />
-          <button class="btn btn-primary" id="btn-add-todo" data-i18n="todo_add">Tambah</button>
-        </div>
+        <!-- Card header: title + sort icon -->
+        <div class="todo-card-header">
+          <h2 class="card-title card-title--left" data-i18n="todo_title">✅ Tasks</h2>
 
-        <!-- Baris Kontrol Utama To-Do List -->
-<div class="todo-controls-bar">
-  
-  <!-- 1. Category -->
-  <label class="control-label">CATEGORY:</label>
-  <select id="todo-difficulty" class="select-field select-sm">
-    <option value="easy" data-i18n="diff_easy">Mudah</option>
-    <option value="normal" selected data-i18n="diff_normal">Normal</option>
-    <option value="hard" data-i18n="diff_hard">Sulit</option>
-  </select>
+          <!-- Sort & Filter popup -->
+          <div class="sort-popup-wrapper" id="sort-popup-wrapper">
+            <button class="sort-icon-btn" id="sort-icon-btn"
+                    aria-label="Sort & Filter" aria-expanded="false">
+              <!-- Sort icon (Excel-style funnel + arrows) -->
+              <svg width="17" height="17" viewBox="0 0 17 17" fill="none"
+                   xmlns="http://www.w3.org/2000/svg">
+                <line x1="1" y1="3.5" x2="16" y2="3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <line x1="3" y1="7.5" x2="14" y2="7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <line x1="5" y1="11.5" x2="12" y2="11.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <line x1="8.5" y1="14" x2="8.5" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <polyline points="6.5,15.5 8.5,17.5 10.5,15.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
 
-  <!-- Garis Pembatas -->
-  <div class="divider"></div>
+            <!-- Popup dropdown -->
+            <div class="sort-popup hidden" id="sort-popup">
+              <p class="sort-popup__section" data-i18n="sort_by">Urutkan:</p>
+              <div class="sort-popup__options">
+                <label class="sort-popup__item">
+                  <input type="radio" name="sort-field" value="created" checked />
+                  <span data-i18n="sort_created">Dibuat</span>
+                </label>
+                <label class="sort-popup__item">
+                  <input type="radio" name="sort-field" value="deadline" />
+                  <span data-i18n="sort_deadline">Deadline</span>
+                </label>
+                <label class="sort-popup__item">
+                  <input type="radio" name="sort-field" value="difficulty" />
+                  <span data-i18n="sort_diff">Kesulitan</span>
+                </label>
+                <label class="sort-popup__item">
+                  <input type="radio" name="sort-field" value="done" />
+                  <span data-i18n="sort_done">Status</span>
+                </label>
+              </div>
+              <div class="sort-popup__divider"></div>
+              <p class="sort-popup__section" data-i18n="sort_dir_label">Arah:</p>
+              <div class="sort-popup__options">
+                <label class="sort-popup__item">
+                  <input type="radio" name="sort-dir" value="asc" checked />
+                  <span data-i18n="sort_asc">↑ Ascending</span>
+                </label>
+                <label class="sort-popup__item">
+                  <input type="radio" name="sort-dir" value="desc" />
+                  <span data-i18n="sort_desc">↓ Descending</span>
+                </label>
+              </div>
+            </div>
+          </div><!-- /sort-popup-wrapper -->
+        </div><!-- /todo-card-header -->
 
-  <!-- 2. Sort By -->
-  <span class="control-label" data-i18n="sort_by">SORT BY:</span>
-  <select id="sort-field" class="select-field select-xs">
-    <option value="created" data-i18n="sort_created">Dibuat</option>
-    <option value="deadline" data-i18n="sort_deadline">Deadline</option>
-    <option value="difficulty" data-i18n="sort_diff">Kesulitan</option>
-    <option value="done" data-i18n="sort_done">Status</option>
-  </select>
+        <!-- Add task block -->
+        <div class="todo-add-block">
 
-  <!-- 3. ASC / DESC -->
-  <button class="btn btn-ghost btn-sort" id="btn-sort-dir">↑ ASC</button>
+          <!-- Row A: input + Add button -->
+          <div class="todo-add-row">
+            <input type="text" id="todo-input" class="input-field"
+              placeholder="Tambah tugas baru..." maxlength="120"
+              data-i18n-placeholder="todo_placeholder" />
+            <button class="btn btn-primary" id="btn-add-todo" data-i18n="todo_add">Tambah</button>
+          </div>
 
-  <!-- Garis Pembatas -->
-  <div class="divider"></div>
+          <!-- Row B: category + deadline — slides in after clicking Add -->
+          <div class="todo-meta-panel hidden" id="todo-meta-panel">
+            <div class="meta-panel__inner">
+              <!-- Category -->
+              <div class="meta-panel__field">
+                <label class="meta-panel__label" data-i18n="cat_label">Kategori:</label>
+                <select id="todo-difficulty" class="filter-select">
+                  <option value="easy"   data-i18n="diff_easy">Mudah</option>
+                  <option value="normal" selected data-i18n="diff_normal">Normal</option>
+                  <option value="hard"   data-i18n="diff_hard">Sulit</option>
+                </select>
+              </div>
+              <!-- Deadline -->
+              <div class="meta-panel__field meta-panel__field--grow">
+                <label class="meta-panel__label" data-i18n="deadline_label">Deadline:</label>
+                <input type="datetime-local" id="todo-deadline" class="filter-date meta-deadline" />
+              </div>
+              <!-- Confirm -->
+              <button class="btn btn-primary meta-panel__confirm" id="btn-confirm-todo"
+                      data-i18n="todo_confirm">✔ Simpan</button>
+              <!-- Cancel -->
+              <button class="meta-panel__cancel" id="btn-cancel-meta" aria-label="Tutup">✕</button>
+            </div>
+          </div>
 
-  <!-- 4. Deadline -->
-  <label class="control-label">DEADLINE:</label>
-  <input type="datetime-local" id="todo-deadline" class="input-field input-sm" />
-  
-</div>
+        </div><!-- /todo-add-block -->
+
         <!-- Task list -->
         <ul id="todo-list" class="todo-list"></ul>
-        <p class="empty-hint hidden" id="todo-empty" data-i18n="todo_empty">Catat Tugasmu hari ini!!! 🚀</p>
+        <p class="empty-hint hidden" id="todo-empty" data-i18n="todo_empty">
+          Catat Tugasmu hari ini!!! 🚀
+        </p>
+
       </div><!-- /todo-card -->
 
     </div><!-- /content-grid -->
-
   </div><!-- /dashboard-wrapper -->
 
-  <!-- ═══════════════════════════════════════
-       EDIT MODAL
-  ════════════════════════════════════════ -->
+  <!-- ═══ EDIT MODAL ═══ -->
   <div id="edit-modal" class="modal-overlay hidden">
     <div class="modal-box">
       <h3 class="modal-title" data-i18n="edit_title">✏️ Edit Tugas</h3>

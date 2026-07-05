@@ -15,16 +15,16 @@ const TRANSLATIONS = {
     timer_title:     '⏱ Focus Timer',
     timer_duration:  'Durasi:',
     timer_start:     '▶ Mulai',
-    timer_stop:      '⏸ Berhenti',
-    timer_reset:     '↺ Atur Ulang',
+    timer_stop:      '⏸ Stop',
+    timer_reset:     '↺ Reset',
     timer_ready:     'Siap untuk fokus?',
     timer_running:   'Fokus! Jangan terganggu 💪',
     timer_paused:    'Dijeda. Klik Start untuk lanjut.',
-    timer_done:      '🎉 Sesi selesai! Saatnya istirahat.',
-    todo_title:      '✅ To-Do List',
+    timer_done:      'Sesi selesai! Saatnya istirahat.',
+    todo_title:      'Tugasku ✏️',
     todo_placeholder:'Tambah tugas baru...',
     todo_add:        'Tambah',
-    todo_empty:      'Catat Tugasmu hari ini!!! 🚀',
+    todo_empty:      'Catat Tugasmu hari ini!!!',
     diff_easy:       'Mudah',
     diff_normal:     'Normal',
     diff_hard:       'Sulit',
@@ -33,7 +33,11 @@ const TRANSLATIONS = {
     sort_deadline:   'Deadline',
     sort_diff:       'Kesulitan',
     sort_done:       'Status',
+    sort_dir_label:  'Tipe Urutan :',
+    sort_asc:        '↑ Menaik (A-Z)',
+    sort_desc:       '↓ Menurun (Z-A)',
     cat_label:       'Kategori:',
+    todo_confirm:    '✔ Simpan',
     links_title:     '🔗 Quick Links',
     links_add:       'Add Link',
     link_name_ph:    'Nama Link',
@@ -69,11 +73,11 @@ const TRANSLATIONS = {
     timer_ready:     'Ready to focus?',
     timer_running:   'Stay focused! 💪',
     timer_paused:    'Paused. Click Start to resume.',
-    timer_done:      '🎉 Session done! Time to rest.',
-    todo_title:      '✅ To-Do List',
+    timer_done:      'Session done! Time to rest.',
+    todo_title:      'My Tasks ✏️',
     todo_placeholder:'Add a new task...',
     todo_add:        'Add',
-    todo_empty:      'List your tasks for today! 🚀',
+    todo_empty:      'List your tasks for today!',
     diff_easy:       'Easy',
     diff_normal:     'Normal',
     diff_hard:       'Hard',
@@ -82,7 +86,11 @@ const TRANSLATIONS = {
     sort_deadline:   'Deadline',
     sort_diff:       'Difficulty',
     sort_done:       'Status',
+    sort_dir_label:  'Sort Type',
+    sort_asc:        '↑ Ascending (A-Z)',
+    sort_desc:       '↓ Descending (Z-A)',
     cat_label:       'Category:',
+    todo_confirm:    '✔ Save',
     links_title:     '🔗 Quick Links',
     links_add:       'Add Link',
     link_name_ph:    'Link Name',
@@ -246,18 +254,63 @@ applyGlobal();
    3. FOCUS TIMER
 ══════════════════════════════════════════ */
 (function initTimer() {
-  const display       = document.getElementById('timer-display');
-  const label         = document.getElementById('timer-label');
-  const btnStart      = document.getElementById('btn-start');
-  const btnStop       = document.getElementById('btn-stop');
-  const btnReset      = document.getElementById('btn-reset');
-  const selectDur     = document.getElementById('timer-select');
+  const display    = document.getElementById('timer-display');
+  const label      = document.getElementById('timer-label');
+  const btnStart   = document.getElementById('btn-start');
+  const btnStop    = document.getElementById('btn-stop');
+  const btnReset   = document.getElementById('btn-reset');
 
-  let duration    = parseInt(selectDur.value, 10) * 60;
-  let remaining   = duration;
-  let intervalId  = null;
-  let isRunning   = false;
+  /* Duration popup */
+  const durPopupBtn   = document.getElementById('dur-popup-btn');
+  const durPopup      = document.getElementById('dur-popup');
+  const durDisplayLbl = document.getElementById('dur-display-label');
 
+  let selectedMinutes = 25;          // default
+  let duration        = selectedMinutes * 60;
+  let remaining       = duration;
+  let intervalId      = null;
+  let isRunning       = false;
+
+  /* ── Duration popup open/close ── */
+  function toggleDurPopup(force) {
+    const open = force !== undefined ? force : durPopup.classList.contains('hidden');
+    if (open) {
+      durPopup.classList.remove('hidden');
+      durPopupBtn.classList.add('open');
+      durPopupBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      durPopup.classList.add('hidden');
+      durPopupBtn.classList.remove('open');
+      durPopupBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  durPopupBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    toggleDurPopup();
+  });
+
+  document.addEventListener('click', e => {
+    const wrapper = document.getElementById('dur-popup-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) toggleDurPopup(false);
+  });
+
+  /* ── Radio button change ── */
+  document.querySelectorAll('input[name="timer-dur"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (isRunning) return; // ignore while running
+      selectedMinutes  = parseInt(radio.value, 10);
+      duration         = selectedMinutes * 60;
+      remaining        = duration;
+      durDisplayLbl.textContent = `${selectedMinutes} min`;
+      display.classList.remove('running', 'finished');
+      label.textContent = t('timer_ready');
+      render();
+      toggleDurPopup(false);
+    });
+  });
+
+  /* ── Timer helpers ── */
   function pad(n) { return String(n).padStart(2, '0'); }
 
   function render() {
@@ -267,10 +320,10 @@ applyGlobal();
   }
 
   function refreshLabel() {
-    if (isRunning)             label.textContent = t('timer_running');
-    else if (remaining === 0)  label.textContent = t('timer_done');
+    if (isRunning)              label.textContent = t('timer_running');
+    else if (remaining === 0)   label.textContent = t('timer_done');
     else if (remaining < duration) label.textContent = t('timer_paused');
-    else                       label.textContent = t('timer_ready');
+    else                        label.textContent = t('timer_ready');
   }
 
   window.__refreshTimerLabel = refreshLabel;
@@ -307,24 +360,12 @@ applyGlobal();
 
   function reset() {
     clearInterval(intervalId);
-    isRunning  = false;
-    duration   = parseInt(selectDur.value, 10) * 60;
-    remaining  = duration;
+    isRunning = false;
+    remaining = duration;
     display.classList.remove('running', 'finished');
     label.textContent = t('timer_ready');
     render();
   }
-
-  /* Duration change — only effective when not running */
-  selectDur.addEventListener('change', () => {
-    if (!isRunning) {
-      duration  = parseInt(selectDur.value, 10) * 60;
-      remaining = duration;
-      display.classList.remove('running', 'finished');
-      label.textContent = t('timer_ready');
-      render();
-    }
-  });
 
   btnStart.addEventListener('click', start);
   btnStop.addEventListener('click',  stop);
@@ -361,55 +402,137 @@ applyGlobal();
   const LS_KEY  = 'life_dashboard_todos';
   const listEl  = document.getElementById('todo-list');
   const inputEl = document.getElementById('todo-input');
-  const btnAdd  = document.getElementById('btn-add-todo');
   const emptyEl = document.getElementById('todo-empty');
 
-  /* Sort state */
-  let sortField = 'created';   // 'created' | 'deadline' | 'difficulty' | 'done'
-  let sortDir   = 'asc';       // 'asc' | 'desc'
+  /* ── Sort state (driven by radio buttons in popup) ── */
+  let sortField = 'created';
+  let sortDir   = 'asc';
 
-  const sortFieldSel  = document.getElementById('sort-field');
-  const btnSortDir    = document.getElementById('btn-sort-dir');
+  /* ── Meta panel elements ── */
+  const metaPanel    = document.getElementById('todo-meta-panel');
+  const diffSel      = document.getElementById('todo-difficulty');
+  const deadlineIn   = document.getElementById('todo-deadline');
+  const btnAdd       = document.getElementById('btn-add-todo');      // opens panel
+  const btnConfirm   = document.getElementById('btn-confirm-todo');  // saves task
+  const btnCancelMeta = document.getElementById('btn-cancel-meta');
 
-  /* Difficulty select + deadline (add row) */
-  const diffSel   = document.getElementById('todo-difficulty');
-  const deadlineIn = document.getElementById('todo-deadline');
+  /* ── Sort popup elements ── */
+  const sortIconBtn  = document.getElementById('sort-icon-btn');
+  const sortPopup    = document.getElementById('sort-popup');
 
-  /* Modal elements */
-  const modal         = document.getElementById('edit-modal');
-  const editInput     = document.getElementById('edit-input');
-  const editDiff      = document.getElementById('edit-difficulty');
-  const editDeadline  = document.getElementById('edit-deadline');
-  const btnSave       = document.getElementById('btn-save-edit');
-  const btnCancel     = document.getElementById('btn-cancel-edit');
-  let   editingId     = null;
+  /* ── Modal elements ── */
+  const modal        = document.getElementById('edit-modal');
+  const editInput    = document.getElementById('edit-input');
+  const editDiff     = document.getElementById('edit-difficulty');
+  const editDeadline = document.getElementById('edit-deadline');
+  const btnSave      = document.getElementById('btn-save-edit');
+  const btnCancel    = document.getElementById('btn-cancel-edit');
+  let   editingId    = null;
 
-  /* ── Storage ── */
+  /* ═══ META PANEL OPEN / CLOSE ═══ */
+  let pendingText = '';
+
+  function openMeta() {
+    pendingText = inputEl.value.trim();
+    if (!pendingText) { inputEl.focus(); return; }
+    metaPanel.classList.remove('hidden');
+    diffSel.value    = 'normal';
+    deadlineIn.value = '';
+    diffSel.focus();
+  }
+
+  function closeMeta() {
+    metaPanel.classList.add('hidden');
+  }
+
+  btnAdd.addEventListener('click', openMeta);
+
+  btnCancelMeta.addEventListener('click', () => {
+    closeMeta();
+    inputEl.focus();
+  });
+
+  /* Enter in input field also opens panel */
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') openMeta();
+  });
+
+  /* Confirm button inside panel — actually saves the task */
+  btnConfirm.addEventListener('click', () => {
+    addTodo(pendingText, diffSel.value, deadlineIn.value);
+    inputEl.value = '';
+    closeMeta();
+    inputEl.focus();
+  });
+
+  /* Enter inside meta panel fields also confirms */
+  deadlineIn.addEventListener('keydown', e => {
+    if (e.key === 'Enter') btnConfirm.click();
+    if (e.key === 'Escape') { closeMeta(); inputEl.focus(); }
+  });
+
+  /* ═══ SORT POPUP ═══ */
+  function toggleSortPopup(force) {
+    const open = force !== undefined ? force : sortPopup.classList.contains('hidden');
+    if (open) {
+      sortPopup.classList.remove('hidden');
+      sortIconBtn.classList.add('open');
+      sortIconBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      sortPopup.classList.add('hidden');
+      sortIconBtn.classList.remove('open');
+      sortIconBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  sortIconBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    toggleSortPopup();
+  });
+
+  document.addEventListener('click', e => {
+    const wrapper = document.getElementById('sort-popup-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) toggleSortPopup(false);
+  });
+
+  /* Radio: sort field */
+  document.querySelectorAll('input[name="sort-field"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      sortField = radio.value;
+      renderTodos();
+    });
+  });
+
+  /* Radio: sort direction */
+  document.querySelectorAll('input[name="sort-dir"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      sortDir = radio.value;
+      renderTodos();
+    });
+  });
+
+  /* ═══ STORAGE ═══ */
   function loadTodos() {
     try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
     catch { return []; }
   }
+  function saveTodos(todos) { localStorage.setItem(LS_KEY, JSON.stringify(todos)); }
 
-  function saveTodos(todos) {
-    localStorage.setItem(LS_KEY, JSON.stringify(todos));
-  }
-
-  /* ── Difficulty ordering ── */
+  /* ═══ SORT ═══ */
   const DIFF_ORDER = { easy: 0, normal: 1, hard: 2 };
 
-  /* ── Sort ── */
   function getSorted(todos) {
     const arr = [...todos];
     arr.sort((a, b) => {
       let cmp = 0;
       if (sortField === 'created') {
-        cmp = (a.id > b.id ? 1 : -1);
+        cmp = a.id > b.id ? 1 : -1;
       } else if (sortField === 'deadline') {
         const ta = a.deadline ? new Date(a.deadline).getTime() : Infinity;
         const tb = b.deadline ? new Date(b.deadline).getTime() : Infinity;
         cmp = ta - tb;
       } else if (sortField === 'difficulty') {
-        cmp = DIFF_ORDER[a.difficulty || 'normal'] - DIFF_ORDER[b.difficulty || 'normal'];
+        cmp = DIFF_ORDER[a.difficulty||'normal'] - DIFF_ORDER[b.difficulty||'normal'];
       } else if (sortField === 'done') {
         cmp = (a.done ? 1 : 0) - (b.done ? 1 : 0);
       }
@@ -418,7 +541,7 @@ applyGlobal();
     return arr;
   }
 
-  /* ── Deadline format ── */
+  /* ═══ FORMAT DEADLINE ═══ */
   function formatDeadline(dtStr) {
     if (!dtStr) return '';
     const d = new Date(dtStr);
@@ -433,7 +556,7 @@ applyGlobal();
     return new Date(dtStr) < new Date();
   }
 
-  /* ── Render ── */
+  /* ═══ RENDER ═══ */
   function renderTodos() {
     const todos = getSorted(loadTodos());
     listEl.innerHTML = '';
@@ -468,19 +591,15 @@ applyGlobal();
       textSpan.className = 'todo-text';
       textSpan.textContent = todo.text;
 
-      /* Meta row */
       const meta = document.createElement('div');
       meta.className = 'todo-meta';
 
-      /* Difficulty badge */
-      const diff = todo.difficulty || 'normal';
+      const diff  = todo.difficulty || 'normal';
       const badge = document.createElement('span');
       badge.className = `badge-diff badge-${diff}`;
       badge.textContent = diffLabel[diff] || diff;
-
       meta.appendChild(badge);
 
-      /* Deadline */
       if (todo.deadline) {
         const dl = document.createElement('span');
         dl.className = `todo-deadline${isOverdue(todo.deadline) && !todo.done ? ' overdue' : ''}`;
@@ -515,19 +634,14 @@ applyGlobal();
 
   window.__rerenderTodo = renderTodos;
 
-  /* ── CRUD ── */
+  /* ═══ CRUD ═══ */
   function addTodo(text, difficulty, deadline) {
     const trimmed = text.trim();
     if (!trimmed) return;
 
     const todos = loadTodos();
-
-    /* Prevent duplicates (case-insensitive) */
-    const duplicate = todos.some(t => t.text.toLowerCase() === trimmed.toLowerCase());
-    if (duplicate) {
-      window.__showToast(t('duplicate_msg'));
-      return;
-    }
+    const duplicate = todos.some(item => item.text.toLowerCase() === trimmed.toLowerCase());
+    if (duplicate) { window.__showToast(t('duplicate_msg')); return; }
 
     todos.push({
       id:         Date.now().toString(),
@@ -541,10 +655,7 @@ applyGlobal();
   }
 
   function toggleDone(id) {
-    const todos = loadTodos().map(item =>
-      item.id === id ? { ...item, done: !item.done } : item
-    );
-    saveTodos(todos);
+    saveTodos(loadTodos().map(item => item.id === id ? { ...item, done: !item.done } : item));
     renderTodos();
   }
 
@@ -555,9 +666,9 @@ applyGlobal();
 
   function openEdit(todo) {
     editingId = todo.id;
-    editInput.value       = todo.text;
-    editDiff.value        = todo.difficulty || 'normal';
-    editDeadline.value    = todo.deadline   || '';
+    editInput.value    = todo.text;
+    editDiff.value     = todo.difficulty || 'normal';
+    editDeadline.value = todo.deadline   || '';
     modal.classList.remove('hidden');
     editInput.focus();
     editInput.select();
@@ -572,67 +683,26 @@ applyGlobal();
   function saveEdit() {
     const newText = editInput.value.trim();
     if (!newText || !editingId) { closeEdit(); return; }
-
     const todos = loadTodos();
-
-    /* Prevent duplicate on edit (skip self) */
-    const duplicate = todos.some(item =>
-      item.id !== editingId &&
-      item.text.toLowerCase() === newText.toLowerCase()
+    const dup = todos.some(item =>
+      item.id !== editingId && item.text.toLowerCase() === newText.toLowerCase()
     );
-    if (duplicate) {
-      window.__showToast(t('duplicate_msg'));
-      return;
-    }
-
-    const updated = todos.map(item =>
+    if (dup) { window.__showToast(t('duplicate_msg')); return; }
+    saveTodos(todos.map(item =>
       item.id === editingId
         ? { ...item, text: newText, difficulty: editDiff.value, deadline: editDeadline.value }
         : item
-    );
-    saveTodos(updated);
+    ));
     closeEdit();
     renderTodos();
   }
 
-  /* ── Sort controls ── */
-  sortFieldSel.addEventListener('change', () => {
-    sortField = sortFieldSel.value;
-    renderTodos();
-  });
-
-  btnSortDir.addEventListener('click', () => {
-    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-    btnSortDir.textContent = sortDir === 'asc' ? '↑ ASC' : '↓ DESC';
-    renderTodos();
-  });
-
-  /* ── Events ── */
-  btnAdd.addEventListener('click', () => {
-    addTodo(inputEl.value, diffSel.value, deadlineIn.value);
-    inputEl.value    = '';
-    deadlineIn.value = '';
-    diffSel.value    = 'normal';
-    inputEl.focus();
-  });
-
-  inputEl.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      addTodo(inputEl.value, diffSel.value, deadlineIn.value);
-      inputEl.value    = '';
-      deadlineIn.value = '';
-      diffSel.value    = 'normal';
-    }
-  });
-
   btnSave.addEventListener('click', saveEdit);
   btnCancel.addEventListener('click', closeEdit);
-
   editInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  saveEdit();
     if (e.key === 'Escape') closeEdit();
   });
-
   modal.addEventListener('click', e => { if (e.target === modal) closeEdit(); });
 
   renderTodos();
@@ -744,4 +814,39 @@ applyGlobal();
   nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') urlInput.focus(); });
 
   renderLinks();
+})();
+
+
+/* ══════════════════════════════════════════
+   7. SETTINGS GEAR BUTTON — open/close dropdown
+══════════════════════════════════════════ */
+(function initSettingsGear() {
+  const gearBtn = document.getElementById('settings-gear-btn');
+  const panel   = document.getElementById('settings-panel');
+
+  function togglePanel(force) {
+    const isOpen = force !== undefined ? force : panel.classList.contains('hidden');
+    if (isOpen) {
+      panel.classList.remove('hidden');
+      gearBtn.classList.add('open');
+      gearBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      panel.classList.add('hidden');
+      gearBtn.classList.remove('open');
+      gearBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  gearBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    togglePanel();
+  });
+
+  document.addEventListener('click', e => {
+    if (!gearBtn.contains(e.target) && !panel.contains(e.target)) togglePanel(false);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') togglePanel(false);
+  });
 })();

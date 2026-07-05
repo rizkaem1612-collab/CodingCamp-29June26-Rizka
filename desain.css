@@ -127,22 +127,62 @@ body {
 .hidden { display: none !important; }
 
 /* ══════════════════════════════════════════
-   SETTINGS PANEL — fixed top-right
+   SETTINGS GEAR BUTTON + DROPDOWN — fixed top-right
 ══════════════════════════════════════════ */
-.settings-panel {
+.settings-wrapper {
   position: fixed;
   top: 16px;
   right: 20px;
   z-index: 900;
+}
+
+/* Gear icon button */
+.settings-gear-btn {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: var(--settings-bg);
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px 14px;
+  background: var(--settings-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow);
+  transition: color var(--transition), border-color var(--transition),
+              transform 0.3s ease;
+  padding: 0;
+}
+.settings-gear-btn:hover { color: var(--accent); border-color: var(--border-hover); }
+.settings-gear-btn.open  { transform: rotate(60deg); color: var(--accent); }
+
+/* Dropdown panel — hidden by default */
+.settings-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--settings-bg);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  animation: slideUp 0.18s ease;
+  transition: background var(--transition);
+}
+
+.settings-panel__title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
 }
 
 .setting-row {
@@ -153,15 +193,15 @@ body {
 }
 
 .setting-label {
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: 0.82rem;
+  font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
-  min-width: 52px;
+  min-width: 60px;
   font-family: var(--font);
 }
 
-/* Toggle — pill-shaped track, circular thumb */
+/* Toggle — pill track, circular thumb */
 .toggle-switch { display: inline-flex; align-items: center; cursor: pointer; }
 .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
 
@@ -169,7 +209,7 @@ body {
   position: relative;
   width: 40px;
   height: 22px;
-  border-radius: 100px;       /* pill */
+  border-radius: 100px;
   background: var(--toggle-bg-off);
   transition: background var(--transition);
   flex-shrink: 0;
@@ -181,7 +221,7 @@ body {
   top: 3px; left: 3px;
   width: 16px; height: 16px;
   background: #fff;
-  border-radius: 50%;          /* circle */
+  border-radius: 50%;
   transition: transform var(--transition);
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
@@ -318,10 +358,59 @@ body {
   white-space: nowrap;
 }
 
-.dur-select {
-  width: 90px;
-  flex: 0 0 auto;
+/* Duration popup wrapper — same positioning pattern as sort popup */
+.dur-popup-wrapper {
+  position: relative;
+  flex-shrink: 0;
 }
+
+/* The trigger button — pill shaped, shows current duration */
+.dur-popup-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--filter-bar-border);
+  border-radius: 100px;
+  background: var(--filter-bar-bg);
+  color: var(--filter-accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition), color var(--transition),
+              box-shadow var(--transition);
+}
+.dur-popup-btn:hover,
+.dur-popup-btn.open {
+  background: var(--filter-accent);
+  color: #fff;
+  border-color: var(--filter-accent);
+  box-shadow: 0 2px 8px var(--filter-accent-ring);
+}
+
+/* Duration popup — inherits .sort-popup visual, opens upward on timer card */
+.dur-popup {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 600;
+  min-width: 140px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.16s ease;
+  /* Scrollable if viewport is short */
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.dur-popup::-webkit-scrollbar { width: 3px; }
+.dur-popup::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
 
 .timer-display {
   font-size: clamp(2.6rem, 5vw, 4rem);
@@ -432,41 +521,204 @@ body {
 .link-input-row { flex-wrap: nowrap; }
 
 /* ══════════════════════════════════════════
-   FILTER BAR  (Kategori + Sort + Deadline + Dir)
-   Single row, fully themed to match light/dark
+   TODO CARD HEADER (title + sort icon)
 ══════════════════════════════════════════ */
-.filter-bar {
+.todo-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.todo-card-header .card-title {
+  margin-bottom: 0;
+}
+
+/* ── Sort icon button ── */
+.sort-popup-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sort-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--filter-bar-border);
+  background: var(--filter-bar-bg);
+  color: var(--filter-accent);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  padding: 0;
+}
+.sort-icon-btn:hover,
+.sort-icon-btn.open {
+  background: var(--filter-accent);
+  color: #fff;
+  border-color: var(--filter-accent);
+}
+
+/* ── Sort popup dropdown ── */
+.sort-popup {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 600;
+  min-width: 200px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.16s ease;
+}
+
+.sort-popup__section {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.sort-popup__options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.sort-popup__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  transition: background var(--transition);
+}
+.sort-popup__item:hover {
+  background: var(--filter-bar-bg);
+}
+.sort-popup__item input[type="radio"] {
+  accent-color: var(--filter-accent);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.sort-popup__item span {
+  flex: 1;
+}
+
+.sort-popup__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+
+/* ══════════════════════════════════════════
+   TODO ADD BLOCK
+   Row A : [input field] [Tambah btn]
+   Row B : meta panel (category + deadline) — revealed on Add click
+══════════════════════════════════════════ */
+.todo-add-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 14px;
+}
+
+/* Row A */
+.todo-add-row {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+}
+.todo-add-row .input-field { flex: 1; min-width: 0; }
+
+/* Row B — meta panel, hidden by default */
+.todo-meta-panel {
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+.todo-meta-panel:not(.hidden) {
+  max-height: 120px;
+  opacity: 1;
+  padding-top: 8px;
+}
+
+.meta-panel__inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
   background: var(--filter-bar-bg);
   border: 1px solid var(--filter-bar-border);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
 }
 
-/* Each labelled chip (label + select/input pair) */
-.filter-chip {
+.meta-panel__field {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
 }
 
-.filter-chip__label {
+.meta-panel__field--grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.meta-panel__label {
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--filter-label-color);
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  line-height: 1;
 }
 
-/* ── Themed select inside filter bar ── */
+.meta-deadline {
+  flex: 1;
+  max-width: 200px;
+  min-width: 0;
+}
+
+.meta-panel__confirm {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+}
+
+.meta-panel__cancel {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 4px 6px;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition);
+}
+.meta-panel__cancel:hover { color: var(--danger); }
+
+/* ══════════════════════════════════════════
+   FILTER SELECT & DATE (shared, used in meta panel)
+══════════════════════════════════════════ */
 .filter-select {
   background: var(--filter-input-bg);
   border: 1px solid var(--filter-input-border);
@@ -483,7 +735,7 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23FF8C42'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 8px center;
-  min-width: 80px;
+  min-width: 90px;
   accent-color: var(--filter-accent);
   transition: border-color var(--transition), box-shadow var(--transition);
 }
@@ -493,7 +745,6 @@ body {
   outline: none;
 }
 
-/* ── Themed datetime input inside filter bar ── */
 .filter-date {
   background: var(--filter-input-bg);
   border: 1px solid var(--filter-input-border);
@@ -505,7 +756,6 @@ body {
   cursor: pointer;
   padding: 5px 9px;
   min-width: 0;
-  max-width: 190px;
   accent-color: var(--filter-accent);
   color-scheme: dark;
   transition: border-color var(--transition), box-shadow var(--transition);
@@ -516,45 +766,6 @@ body {
   box-shadow: 0 0 0 2px var(--filter-accent-ring);
   outline: none;
 }
-
-/* Thin vertical divider between chips */
-.filter-divider {
-  display: block;
-  width: 1px;
-  height: 20px;
-  background: var(--filter-bar-border);
-  flex-shrink: 0;
-  align-self: center;
-}
-
-/* ASC/DESC direction button */
-.filter-dir-btn {
-  margin-left: auto;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 14px;
-  border: 1px solid var(--filter-accent);
-  border-radius: 100px;
-  background: var(--filter-accent-dim);
-  color: var(--filter-accent);
-  font-size: 0.75rem;
-  font-weight: 700;
-  font-family: var(--font);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background var(--transition), color var(--transition), box-shadow var(--transition);
-}
-.filter-dir-btn:hover {
-  background: var(--filter-accent);
-  color: #fff;
-  box-shadow: 0 2px 8px var(--filter-accent-ring);
-}
-
-/* ══════════════════════════════════════════
-   TODO LIST
-══════════════════════════════════════════ */
 .todo-card {
   min-height: 300px; 
   width: 100%;
@@ -562,6 +773,9 @@ body {
   max-width: 750px; 
   margin-left: auto;
 }
+/* ══════════════════════════════════════════
+   TODO LIST
+══════════════════════════════════════════ */
 .todo-list {
   list-style: none;
   display: flex;
@@ -855,10 +1069,24 @@ body {
   .todo-card    { align-self: auto; }
 }
 
-@media (max-width: 540px) {
+@media (max-width: 600px) {
   body { padding: 10px 10px 48px; }
-  .settings-panel { top: 10px; right: 10px; padding: 10px 12px; }
+  .settings-wrapper { top: 10px; right: 10px; }
   .current-time   { font-size: 2.4rem; }
   .link-input-row { flex-wrap: wrap; }
   .input-row      { flex-wrap: wrap; }
+
+  /* Meta panel stacks on mobile */
+  .meta-panel__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .meta-panel__field { width: 100%; justify-content: space-between; }
+  .meta-panel__field--grow { width: 100%; }
+  .meta-deadline { max-width: 100%; }
+  .meta-panel__confirm { width: 100%; justify-content: center; }
+
+  /* Sort popup full width on mobile */
+  .sort-popup { right: auto; left: 0; min-width: 180px; }
 }
